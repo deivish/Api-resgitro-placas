@@ -48,7 +48,7 @@ El proyecto utiliza las siguientes tecnologías y herramientas:
 1. Clonar el repositorio:
 
    ```bash
-   git clone https://github.com/tu-usuario/nombre-del-repositorio.git
+   git clone [https://github.com/deivish/Api-resgitro-placas.git]
    cd nombre-del-repositorio
 
 ##Instalar dependencias:
@@ -56,51 +56,51 @@ El proyecto utiliza las siguientes tecnologías y herramientas:
 - npm install express mongoose dotenv cors
 - npm install --save-dev jest supertest
   
-##Configurar las variables de entorno:
--Crear un archivo .env en la raíz del proyecto y configurar las siguientes variables:
-PORT=3000
-MONGO_URI=mongodb+srv://usuario:contraseña@cluster.mongodb.net/nombre-base-datos
+###Configurar las variables de entorno:
+- Crear un archivo .env en la raíz del proyecto y configurar las siguientes variables:
+- PORT=3000
+- MONGO_URI=mongodb+srv://usuario:contraseña@cluster.mongodb.net/nombre-base-datos
 
 ###Iniciar el servidor:
--npm run dev
+- npm run dev
 ###Acceder a la documentación de Swagger en tu navegador:
--http://localhost:3000/api-docs
+- http://localhost:3000/api-docs
 
-#Endpoints
+## Endpoints
 A continuación, se describen algunos de los endpoints principales:
-1. Registrar un vehículo (POST /api/registros)
+- Registrar un vehículo (POST /api/registros)
 Registra un nuevo vehículo en el sistema.
--Cuerpo de la solicitud:
+- Cuerpo de la solicitud:
 {
   "placa": "AA123BB",
   "tipo": "moto"
 }
 
--Respuestas:
+- Respuestas:
 
-.201: Vehículo registrado exitosamente.
-.400: Error al registrar el vehículo.
+- 201: Vehículo registrado exitosamente.
+- 400: Error al registrar el vehículo.
 
 2. Obtener todos los registros (GET /api/registros)
 Devuelve una lista de todos los vehículos registrados.
 
--Respuestas:
-.200: Lista de registros obtenida exitosamente.
+- Respuestas:
+- 200: Lista de registros obtenida exitosamente.
 
 3. Actualizar hora de salida (PUT /api/registros/:id)
 Actualiza la hora de salida de un vehículo específico.
 
--Parámetros de la ruta:
+- Parámetros de la ruta:
 
-id: ID del registro.
--Cuerpo de la solicitud:
+- id: ID del registro.
+- Cuerpo de la solicitud:
 {
   "horaSalida": "2024-11-19T14:30:00Z"
 }
-.Respuestas:
+- Respuestas:
 
-.200: Hora de salida actualizada exitosamente.
-.404: Registro no encontrado.
+- 200: Hora de salida actualizada exitosamente.
+- 404: Registro no encontrado.
 
 4. Eliminar un registro (DELETE /api/registros/:id)
    Elimina un registro específico del sistema.
@@ -108,26 +108,11 @@ id: ID del registro.
 Parámetros de la ruta:
 
 id: ID del registro.
--Respuestas:
+- Respuestas:
 
 .200: Registro eliminado exitosamente.
 .404: Registro no encontrado.
 
-###Extructura del Proyecto
-nombre-del-repositorio/
-├── controllers/
-│   └── registroController.js   # Lógica de los controladores
-├── models/
-│   └── Registro.js             # Modelo de datos de Mongoose
-├── routes/
-│   └── registroRoutes.js       # Definición de rutas
-├── swagger/
-│   └── swagger-config.json     # Configuración de Swagger
-├── .env                        # Variables de entorno
-├── .eslintrc.js                # Configuración de ESLint
-├── app.js                      # Configuración principal del servidor
-├── package.json                # Dependencias y scripts
-└── README.md                   # Documentación del proyecto
 ##Contacto
 Contacto
 Si tienes preguntas o sugerencias, por favor no dudes en contactar:
