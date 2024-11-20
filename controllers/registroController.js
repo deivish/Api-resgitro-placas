@@ -14,7 +14,7 @@ const crearRegistro = async (req, res) => {
     try {
         const { placa } = req.body;
 
-       
+
         const existeRegistro = await Registro.findOne({ placa });
         if (existeRegistro) {
             return res.status(400).json({
@@ -23,7 +23,7 @@ const crearRegistro = async (req, res) => {
             });
         }
 
-       
+
         const nuevoRegistro = new Registro(req.body);
         const registroGuardado = await nuevoRegistro.save();
 
@@ -42,7 +42,7 @@ const crearRegistro = async (req, res) => {
 const actualizarSalida = async (req, res) => {
     const { id } = req.params;
 
-    
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
             message: "ID inválido",
