@@ -1,65 +1,93 @@
-let registros = []; 
-let contadorId = 1; 
-const obtenerRegistros = (req, res) => {
-    res.status(200).json(registros);
+const mongoose = require('mongoose');
+const Registro = require('../models/registerSchema');
+
+const obtenerRegistros = async (req, res) => {
+    try {
+        const registros = await Registro.find();
+        res.status(200).json(registros);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener registros', error });
+    }
 };
 
-const crearRegistro = (req, res) => {
-    const { placa, tipo } = req.body;
+const crearRegistro = async (req, res) => {
+    try {
+        const { placa } = req.body;
 
-    
-    if (!['carro', 'moto'].includes(tipo)) {
-        return res.status(400).json({ message: 'El tipo debe ser "carro" o "moto".' });
+       
+        const existeRegistro = await Registro.findOne({ placa });
+        if (existeRegistro) {
+            return res.status(400).json({
+                message: "Ya existe un registro con esta placa",
+                placa: existeRegistro.placa,
+            });
+        }
+
+       
+        const nuevoRegistro = new Registro(req.body);
+        const registroGuardado = await nuevoRegistro.save();
+
+        res.status(201).json({
+            message: "Registro creado con éxito",
+            data: registroGuardado,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error al crear registro",
+            error: error.message,
+        });
     }
-
-    
-    const limite = tipo === 'carro' ? 5 : 10;
-    const ocupados = registros.filter(r => r.tipo === tipo && !r.horaSalida).length;
-
-    if (ocupados >= limite) {
-        return res.status(400).json({ message: `No hay cupos disponibles para ${tipo}s.` });
-    }
-
-    
-    const nuevoRegistro = {
-        id: contadorId++,
-        placa,
-        tipo,
-        horaEntrada: new Date(),
-        horaSalida: null,
-    };
-
-    registros.push(nuevoRegistro);
-    res.status(201).json(nuevoRegistro);
 };
 
-const actualizarSalida = (req, res) => {
+const actualizarSalida = async (req, res) => {
     const { id } = req.params;
 
-    const registro = registros.find(r => r.id === parseInt(id));
-
-    if (!registro) {
-        return res.status(404).json({ message: 'Registro no encontrado.' });
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            message: "ID inválido",
+        });
     }
 
-    if (registro.horaSalida) {
-        return res.status(400).json({ message: 'La salida ya fue registrada.' });
-    }
+    try {
+        const registroActualizado = await Registro.findByIdAndUpdate(
+            id,
+            { horaSalida: new Date() },
+            { new: true }
+        );
 
-    registro.horaSalida = new Date();
-    res.status(200).json(registro);
+        if (!registroActualizado) {
+            return res.status(404).json({
+                message: "Registro no encontrado",
+            });
+        }
+
+        res.status(200).json({
+            message: "Registro actualizado con éxito",
+            data: registroActualizado,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error al actualizar registro",
+            error: error.message,
+        });
+    }
 };
 
-const eliminarRegistro = (req, res) => {
+const eliminarRegistro = async (req, res) => {
     const { id } = req.params;
 
-    const indice = registros.findIndex(r => r.id === parseInt(id));
-    if (indice === -1) {
-        return res.status(404).json({ message: 'Registro no encontrado.' });
-    }
+    try {
+        const registroEliminado = await Registro.findByIdAndDelete(id);
 
-    registros.splice(indice, 1);
-    res.status(200).json({ message: 'Registro eliminado con éxito.' });
+        if (!registroEliminado) {
+            return res.status(404).json({ message: 'Registro no encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Registro eliminado con éxito.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar registro', error });
+    }
 };
 
 module.exports = { obtenerRegistros, crearRegistro, actualizarSalida, eliminarRegistro };
