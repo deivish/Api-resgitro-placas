@@ -11,27 +11,42 @@ const obtenerRegistros = async (req, res) => {
 };
 
 const crearRegistro = async (req, res) => {
+    const { placa, tipo } = req.body;
+
+    if (!['carro', 'moto'].includes(tipo)) {
+        return res.status(400).json({
+            message: "Tipo inválido. Debe ser 'carro' o 'moto'.",
+        });
+    }
+
     try {
-        const { placa } = req.body;
+        const registrosActivos = await Registro.countDocuments({
+            tipo,
+            horaSalida: null,
+        });
 
+        const limiteCupos = tipo === 'carro' ? 5 : 10;
 
-        const existeRegistro = await Registro.findOne({ placa });
-        if (existeRegistro) {
+        if (registrosActivos >= limiteCupos) {
             return res.status(400).json({
-                message: "Ya existe un registro con esta placa",
-                placa: existeRegistro.placa,
+                message: `No hay cupos disponibles para ${tipo}s.`,
             });
         }
 
-
-        const nuevoRegistro = new Registro(req.body);
-        const registroGuardado = await nuevoRegistro.save();
+        const nuevoRegistro = await Registro.create({ placa, tipo });
 
         res.status(201).json({
-            message: "Registro creado con éxito",
-            data: registroGuardado,
+            message: "Registro creado exitosamente",
+            data: nuevoRegistro,
         });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Ya existe un registro con esa placa.",
+                error: error.message,
+            });
+        }
+
         res.status(500).json({
             message: "Error al crear registro",
             error: error.message,
